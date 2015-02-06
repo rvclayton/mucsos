@@ -150,21 +150,23 @@ progname=`basename $0`
 	# The file has to exist, has to be in the current directory, and must
 	# not be a directory.
 
-	  if [ ! -r $f ] ; then 
+	  if [ ! -r "$f" ] ; then 
 	    emsg "Can't find the file $f in the current directory" 
 	    e=1
-	  elif (( $(expr $f : '.*/') != 0 )) ; then 
+	  elif (( $(expr "$f" : '.*/') != 0 )) ; then 
 	    msg=$(( 
-	      echo "The file $f can't be turned in.  All files to be turned-in"
-	      echo "must be in the current directory") | fmt )
+	      echo "The file $f can't be turned in.  All files to be "
+	      echo "turned-in must be in the current directory") | fmt )
+	    emsg "$msg"
 	    e=1
-	  elif [ -d $f ] ; then 
+	  elif [ -d "$f" ] ; then 
 	    emsg "$f is a directory and can't be turned in"
 	    e=1
 	  else
 	    files="$files$f "
 	  fi
       done
+
       (( e == 0 )) || oops "Nothing sent"
 
   else
@@ -226,6 +228,10 @@ progname=`basename $0`
 
 
 # $Log: send-files,v $
+# Revision 1.6  2015/02/06 15:49:32  rclayton
+# call emsg to print the error message when trying to submit a file in some
+# other directory
+#
 # Revision 1.5  2015/02/02 21:56:28  rclayton
 # don't auto-send if files are given on the command line.
 #
