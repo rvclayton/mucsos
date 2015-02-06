@@ -1,0 +1,281 @@
+#! /bin/bash
+#
+# send-files - mail in program files.
+#
+
+
+function emsg {
+
+  # Print the error message $1 to std-err.
+
+  local period=""
+  expr "$1" : '.*\.$' >/dev/null || period="."
+
+  echo 1>&2 "$1$period"
+  }
+
+
+function oops {
+
+  # Print the error message $1 to std-err and die.
+
+  emsg "$1"
+  exit 1
+  }
+
+
+function badcmd {
+
+  # Print an error message about command format, optionally preceeded by the
+  # explanation message $1, then die.
+
+  test -z "$1" || emsg "$1"
+
+  local em="Command format is \"$progname ano s|t"
+  if [ "$auto_send_files" = "true" ] ; then
+    em="$em [filename...]"
+  else
+    em="$em filename..."
+  fi
+  em="$em\""
+
+  emsg "$em"
+  oops "Nothing sent"
+  }
+
+
+PATH=/usr/bin:/bin
+progname=`basename $0`
+
+# All the following variables must use single quotes as shown.
+
+# An egrep regular expression recognizing all valid assignment numbers.
+
+  anopat='1|2|3|4|5|6'
+
+# If no files are given on the command-line, send the files in the current
+# directory.
+
+  auto_send_files='true'
+
+# The course number
+
+  CNO='os'
+
+# If equal to true, look for a group file with submissions; otherwise don't.
+
+  do_groups='true'
+
+# Files matching this pattern are also files to be turned-in.
+
+  otherpat=''
+
+# Files matching this glob pattern are files to be turned-in.
+
+  srcpat='*.java'
+
+# If testing = true, then do everything but send the files.
+
+  testing=${testing:-'false'}
+
+
+# You can't send mail from cslin machines.
+
+  expr $(uname -n) : cslin > /dev/null && 
+    oops "You can't send mail from cslin machines"
+
+
+# Get the command-line options.
+
+  # There must be at least two command-line arguments: the assignment number
+  # and whether or not the turn-in is a submission or a test.  If the script
+  # auto-sends files, that's all that's needed (although there may be more).
+  # If the script doesn't auto-send files, there has to be at least one more
+  # comamnd-line option representing a file being turned in.
+
+    n=2
+    test "$auto_send_files" = "true" || n=3
+
+    (( $# < n )) &&
+      badcmd "At least $n command-line arguments expected, $# given"
+
+
+  # The first command-line argument is the assignment number.
+
+    ano="$1"
+    echo $ano | egrep "^$anopat\$" >/dev/null 2>/dev/null || {
+      msg=$(( echo "The command-line argument '$ano' is not a valid "
+	      echo "assignment number.  Valid assignment numbers should "
+	      echo "match the regular expression \"$anopat\" without the "
+	      echo "double quotes" ) | fmt )
+      badcmd "$msg"
+      }
+    shift 1
+
+  # The second command-line argument should be the turn-in action.
+
+    what="$1"
+    expr "$what" : '[stST]' >/dev/null 2>&1  || {
+      msg=$(( echo "The command-line argument '$what' is not a valid turn-in "
+	      echo "action.  Valid turn-in actions are 's' (without quotes) "
+	      echo "for \"submit\" and 't' (ditto) for \"test\"") | fmt )
+      badcmd "$msg"
+      }
+    shift 1
+
+
+# The remaining command-line arguments, if any, are taken as files to turn-in.
+# If this script can auto-send, the command-line may be empty, in which case
+# all matching files in the current directory are sent.
+
+  if test "$auto_send_files" != 'true' || (( $# > 0 )) ; then
+
+    # No auto-sending, or there are more command-line arguments, which
+    # are taken to be files to submit.
+
+    # If there is no auto-sending, there have to be files.
+
+      test "$auto_send_files" != 'true' && (( $# == 0 )) &&
+	badcmd "There are no files to turn-in given on the command line"
+
+    # Pick-off the files to send from the command line.
+
+      files=''
+      e=0
+
+      while (( $# > 0 )) ; do
+	f="$1"
+	shift 1
+
+	# The file has to exist, has to be in the current directory, and must
+	# not be a directory.
+
+	  if [ ! -r $f ] ; then 
+	    emsg "Can't find the file $f in the current directory" 
+	    e=1
+	  elif (( $(expr $f : '.*/') != 0 )) ; then 
+	    msg=$(( 
+	      echo "The file $f can't be turned in.  All files to be turned-in"
+	      echo "must be in the current directory") | fmt )
+	    e=1
+	  elif [ -d $f ] ; then 
+	    emsg "$f is a directory and can't be turned in"
+	    e=1
+	  else
+	    files="$files$f "
+	  fi
+      done
+      (( e == 0 )) || oops "Nothing sent"
+
+  else
+
+    # Auto-send all the files in the current directory matching the primary and
+    # secondary glob patterns.
+
+      cfiles=$(ls $srcpat 2>/dev/null)
+      if [ ! "$cfiles" ] ; then
+	msg=$(( 
+	  echo "Can't find any turn-in files matching the pattern \"$srcpat\" "
+	  echo "(without quotes) in the current directory") | fmt)
+	emsg "$msg"
+	oops "Nothing sent"
+      fi
+
+      hfiles=''
+      [ -n "$otherpat" ] && hfiles=$(ls $otherpat 2>/dev/null)
+      files="$cfiles $hfiles"
+
+  fi
+
+
+# Check for a group file if it's needed; add it if it's needed and not
+# given (and exists).
+
+  if [ "$do_groups" = "true" -a "$what" = "submit" ] ; then
+    if (( $(expr " $files " : '.* group ') > 0 )) ; then
+      :
+    elif [ -r group ] ; then
+      files="$files${files:+ }group"
+    else
+      emsg=$((
+        echo "No group file named \"group\" found in the current directory"
+        echo "See http://bluehawk.monmouth.edu/~rclayton/web-pages/s15-os/turnin.html#groups for details." ) | fmt)
+      oops "$emsg"
+    fi
+  fi
+
+
+# Helpful feedback.
+
+  echo "Files sent:"
+  ( echo $files | tr ' ' '\12' | sort ) | 
+  while read f ; do echo "  $f" 1>&2 ; done
+
+
+# That's it.
+
+  mail=mail
+
+  if [[ "$testing" != true ]] ; then
+    tar cf - $files |
+    uuencode $CNO.tar 2>/dev/null |
+    $mail -s "$CNO assignment $ano $what" rclayton@monmouth.edu
+  else
+    echo "$mail -s \"$CNO assignment $ano $what\" rclayton@monmouth.edu"
+  fi
+
+
+# $Log: send-files,v $
+# Revision 1.5  2015/02/02 21:56:28  rclayton
+# don't auto-send if files are given on the command line.
+#
+# Revision 1.4  2015/01/26 03:20:42  rclayton
+# check testing against true
+#
+# Revision 1.3  2015/01/26 03:15:30  rclayton
+# If testing is non-empty in the environment, use that value, otherwise use
+# the default.
+#
+# Revision 1.2  2015/01/25 23:48:55  rclayton
+# The assignment number and turn-in action aren't optional, so put them
+# on the command line.
+#
+# Revision 1.14  2003/09/02 20:44:38  rclayton
+# Use an egrep pattern to check the assignment number.
+#
+# Revision 1.13  2003/07/08 16:10:19  rclayton
+# Specify glob patters for source and other files.
+#
+# Revision 1.12  2002/09/03 18:37:24  rclayton
+# Generify the source file discovery.
+#
+# Revision 1.11  2002/06/06 00:27:11  rclayton
+# Chose between mail and mailx for the mailer.
+#
+# Revision 1.10  2002/04/13 20:49:04  rclayton
+# Use = instead of == in test.
+#
+# Revision 1.9  2002/04/13 20:28:53  rclayton
+# Add the auto-send-files variable.
+#
+# Revision 1.8  2002/03/04 22:38:00  rclayton
+# Straighten out group file handling.
+#
+# Revision 1.7  2002/02/04 15:56:14  rclayton
+# Look for variant include-file extensions.
+#
+# Revision 1.6  2001/11/05 14:59:55  rclayton
+# Respell max_asgmt as max_asgmnt.
+#
+# Revision 1.5  2001/10/31 15:44:50  rclayton
+# Explicitly check do_groups = true.
+#
+# Revision 1.4  2001/10/24 14:27:16  rclayton
+# Customize via cno, do_groups, testing, and max_asgmt.
+#
+# Revision 1.2  2001/04/05 00:19:34  rclayton
+# Make generic with respect to the course number; sort the files listed;
+# include a group file if there is one.
+#
+# Revision 1.1  2001/04/04 23:23:15  rclayton
+# Initial revision
