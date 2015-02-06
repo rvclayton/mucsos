@@ -1,4 +1,4 @@
-// Operating Systems, Spring 2012
+// Operating Systems, Spring 2015
 
 
 /**
@@ -9,6 +9,11 @@
    methods, and classes defined for convenience (the extra types, methods, and
    classes are not necessarily related to primary store).
 
+   This interface is implemented by code in the simulator jar file.  Your
+   operating-system code does not implment this interface. Your
+   operating-system code makes use of the types, methods and classes defined in
+   this interface.  This file should not be modified; changes made to this file
+   are ignored by the turn-in system.
  */
 
 
@@ -219,6 +224,9 @@ extends PrimaryStore {
 
 
 // $Log: Hardware.java,v $
+// Revision 1.5  2015/02/06 19:09:11  rclayton
+// amplify on the implementor's responsibility.
+//
 // Revision 1.4  2012/02/19 03:03:52  rclayton
 // Renumber the status codes.
 //
