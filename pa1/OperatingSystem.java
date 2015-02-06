@@ -1,4 +1,4 @@
-// Operating Systems, Spring 2012
+// Operating Systems, Spring 2015
 
 /**
    The OperatingSystem interface defines the characteristics of an operating
@@ -35,6 +35,11 @@
 
    The instance passed in as a parameter to the constructor is the instance of
    the hardware on which the operating system is running.
+
+   Your operating-system code implments this interface as described above; this
+   interface is not implemented by code in the simulator jar file.  This file
+   should not be modified; changes made to this file are ignored by the turn-in
+   system.
  */
 
 
@@ -95,6 +100,12 @@ interface OperatingSystem {
 
 
 // $Log: OperatingSystem.java,v $
+// Revision 1.5  2015/02/06 19:07:31  rclayton
+// amplify on the implementor's responsibilities.
+//
+// Revision 1.4  2015/02/05 12:40:23  rclayton
+// document implementation requirements.
+//
 // Revision 1.3  2012/02/16 19:35:53  rclayton
 // Defined OperatingSystem.SystemCall.toString().
 //
