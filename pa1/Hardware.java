@@ -31,15 +31,15 @@ extends PrimaryStore {
 
       systemBase = 0,
       systemSize = 1024,
-      systemTop = systemBase + systemSize,
+      systemTop	 = systemBase + systemSize,
 
       userBase = systemTop,
       userSize = 1024,
-      userTop = userBase + userSize,
+      userTop  = userBase + userSize,
 
       deviceBase = userTop,
       deviceSize = 1024,
-      deviceTop = deviceBase + deviceSize,
+      deviceTop	 = deviceBase + deviceSize,
 
       storageTop = deviceTop,
 
@@ -57,14 +57,15 @@ extends PrimaryStore {
       nextRegister = systemBase + registerSetSize,
 
       baseRegister = nextRegister - 1,
-      topRegister = baseRegister - 1,
-      IARegister = topRegister - 1,
-      PCRegister = IARegister - 1,
-      PSRegister = PCRegister - 1,
+      topRegister  = baseRegister - 1,
+      IARegister   = topRegister - 1,
+      PCRegister   = IARegister - 1,
+      PSRegister   = PCRegister - 1,
     
 
     /**
        The simulator puts an idle program in the kernel so the os has something
+       to execute when it has nothing else to execute.
     */
 
       // The address of the first word of the idle program.
@@ -73,20 +74,20 @@ extends PrimaryStore {
 
       // The address one past the last word of the idle program.
 
-      idleEnd = idleStart + 1,
+      idleEnd   = idleStart + 1,
 
 
     /**
        Device-space addresses.
     */
 
-      clockRegister = deviceBase,
-      countdownRegister = clockRegister + 1,
-      haltRegister = countdownRegister + 1,
+      clockRegister	  = deviceBase,
+      countdownRegister	  = clockRegister + 1,
+      haltRegister	  = countdownRegister + 1,
       diskCommandRegister = haltRegister + 1,
-      diskBlockRegister = diskCommandRegister + 1,
+      diskBlockRegister	  = diskCommandRegister + 1,
       diskAddressRegister = diskBlockRegister + 1,
-      diskStatusRegister = diskAddressRegister + 1;
+      diskStatusRegister  = diskAddressRegister + 1;
     }
 
 
@@ -224,6 +225,9 @@ extends PrimaryStore {
 
 
 // $Log: Hardware.java,v $
+// Revision 1.6  2015/02/10 04:10:47  rclayton
+// finish the idle-process documentation
+//
 // Revision 1.5  2015/02/06 19:09:11  rclayton
 // amplify on the implementor's responsibility.
 //
