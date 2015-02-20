@@ -112,15 +112,20 @@ progname=`basename $0`
       }
     shift 1
 
+
   # The second command-line argument should be the turn-in action.
 
     what="$1"
-    expr "$what" : '[stST]' >/dev/null 2>&1  || {
+    if expr "$what" : '[sS]' >/dev/null 2>&1 ; then
+      what="submit"
+    elif expr "$what" : '[tT]' >/dev/null 2>&1 ; then
+      what="test"
+    else
       msg=$(( echo "The command-line argument '$what' is not a valid turn-in "
-	      echo "action.  Valid turn-in actions are 's' (without quotes) "
-	      echo "for \"submit\" and 't' (ditto) for \"test\"") | fmt )
+              echo "action.  Valid turn-in actions are 's' (without quotes) "
+              echo "for \"submit\" and 't' (ditto) for \"test\"") | fmt )
       badcmd "$msg"
-      }
+    fi
     shift 1
 
 
@@ -197,10 +202,10 @@ progname=`basename $0`
     if (( $(expr " $files " : '.* group ') > 0 )) ; then
       :
     elif [ -r group ] ; then
-      files="$files${files:+ }group"
+      files="$files group"
     else
       emsg=$((
-        echo "No group file named \"group\" found in the current directory"
+        echo "No group file named \"group\" found in the current directory."
         echo "See http://bluehawk.monmouth.edu/~rclayton/web-pages/s15-os/turnin.html#groups for details." ) | fmt)
       oops "$emsg"
     fi
@@ -228,6 +233,9 @@ progname=`basename $0`
 
 
 # $Log: send-files,v $
+# Revision 1.7  2015/02/15 00:23:21  rclayton
+# assign the right value to what
+#
 # Revision 1.6  2015/02/06 15:49:32  rclayton
 # call emsg to print the error message when trying to submit a file in some
 # other directory
