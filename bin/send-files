@@ -3,7 +3,6 @@
 # send-files - mail in program files.
 #
 
-
 function emsg {
 
   # Print the error message $1 to std-err.
@@ -85,8 +84,24 @@ progname=`basename $0`
     oops "You can't send mail from cslin machines"
 
 
-# Get the command-line options.
+# Get the command-line arguments.
 
+  # The first command-line argument may be a -e option to print environment
+  # information for debugging.
+
+    [ "$1" = "-e" ] && {
+      [ "$testing" != "true" ] && {
+        (echo "date:" $(date)
+	 echo "pwd:" $(pwd)
+	 echo "hostname:" $(hostname)
+	 echo "command line:  '$0 $*'"
+	 echo "env:"
+	 env
+        ) | mail -s "send-files info for $(whoami)" rclayton@monmouth.edu
+        }
+      shift 1
+      }
+  
   # There must be at least two command-line arguments: the assignment number
   # and whether or not the turn-in is a submission or a test.  If the script
   # auto-sends files, that's all that's needed (although there may be more).
