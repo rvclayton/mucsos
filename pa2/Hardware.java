@@ -194,8 +194,7 @@ extends PrimaryStore {
       badCommand     = 3,
       ok             = 10,
       badPid         = 6,
-      noResource     = 9
-      ;
+      noResource     = 9;
 
 
     /**

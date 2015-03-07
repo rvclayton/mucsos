@@ -1,4 +1,7 @@
 // Operating Systems, Spring 2015
+//
+// This file has been generated automatically.  Edits made to this file will be
+// lost when next generated.
 
 /**
    The OperatingSystem interface defines the characteristics of an operating
@@ -38,12 +41,12 @@
 
    Your operating-system code implments this interface as described above; this
    interface is not implemented by code in the simulator jar file.  This file
-   should not be modified; changes made to this file are ignored by the turn-in
-   system.
- */
+   should not be turned-in; the turn-in system ignores this file.
+  */
 
 
-interface OperatingSystem {
+interface
+OperatingSystem {
 
   /**
      The system calls defined by the operating system.
@@ -59,11 +62,11 @@ interface OperatingSystem {
      */
 
     static final int
-      exec    =  2,
-      exit    =  3,
-      getSlot =  4,
-      putSlot =  6,
-      yield   = 11;
+      exec = 1,
+      exit = 2,
+      getSlot = 3,
+      putSlot = 4,
+      yield = 5;
 
 
     /**
@@ -77,14 +80,13 @@ interface OperatingSystem {
     static String
     toString(int s) {
       switch (s) {
-	case exec    : return "exec";
-	case exit    : return "exit";
-	case getSlot : return "getSlot";
-	case putSlot : return "putSlot";
-	case yield   : return "yield";
-	default      : SystemSim.panic("Unknown system-call value:  " + s);
+        case exec:  return "exec";
+        case exit:  return "exit";
+        case getSlot:  return "getSlot";
+        case putSlot:  return "putSlot";
+        case yield:  return "yield";
+        default: return "[SystemCall.toString(" + s + ") unknown]";
         }
-      return "";
       }
     }
 
@@ -99,19 +101,4 @@ interface OperatingSystem {
   }
 
 
-// $Log: OperatingSystem.java,v $
-// Revision 1.5  2015/02/06 19:07:31  rclayton
-// amplify on the implementor's responsibilities.
-//
-// Revision 1.4  2015/02/05 12:40:23  rclayton
-// document implementation requirements.
-//
-// Revision 1.3  2012/02/16 19:35:53  rclayton
-// Defined OperatingSystem.SystemCall.toString().
-//
-// Revision 1.2  2012/02/13 00:45:26  rclayton
-// Assign the correct values to system-calls.
-//
-// Revision 1.1  2012/02/12 20:37:33  rclayton
-// Initial revision
-//
+// $Log: $

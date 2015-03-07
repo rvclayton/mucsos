@@ -192,10 +192,9 @@ extends PrimaryStore {
       badAddress     = 1,
       badBlockNumber = 2,
       badCommand     = 3,
+      ok             = 10,
       badPid         = 6,
-      noResource     = 9,
-      ok             = 10
-      ;
+      noResource     = 9;
 
 
     /**
@@ -212,9 +211,9 @@ extends PrimaryStore {
 	case badAddress    : return "bad address";
 	case badBlockNumber: return "bad block number";
 	case badCommand    : return "bad command";
+	case ok            : return "ok";
 	case badPid        : return "bad PID";
 	case noResource    : return "no resource";
-	case ok            : return "ok";
 	default            : SystemSim.panic("Unknown status value:  " + s);
         }
       return "";
@@ -224,9 +223,6 @@ extends PrimaryStore {
 
 
 // $Log: Hardware.java,v $
-// Revision 1.6  2015/02/22 19:45:51  rclayton
-// define the csin and csout system-call values.
-//
 // Revision 1.5  2015/02/06 19:09:11  rclayton
 // amplify on the implementor's responsibility.
 //
